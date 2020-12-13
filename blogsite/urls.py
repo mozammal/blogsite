@@ -22,3 +22,4 @@ urlpatterns = [
     path("blog/", include("blog.urls", namespace="blog")),
     path("", RedirectView.as_view(url="/blog", permanent=False), name="default"),
 ]
+docker 

@@ -1,29 +1,61 @@
 version: '3'
 services:
   db:
-    image: mysql:8
+    image: mysql:5.7.8
+    container_name: db
     ports:
       - "3306:3306"
-    environment:
-      - MYSQL_DATABASE='blog'
-      - MYSQL_USER='root'
-      - MYSQL_PASSWORD='123456'
-      - MYSQL_ROOT_PASSWORD='123456'
     volumes:
-      - /tmp/django-app/mysqld:/var/run/mysqld
-      - ./db:/var/lib/mysql
+      - "db_data:/var/lib/mysql"
+    environment:
+      - MYSQL_DATABASE=blog
+      - MYSQL_ROOT_PASSWORD=123456
+    networks:
+      - elk-network
+
+  elk1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.0.1
+    container_name: elk1
+    environment:
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - ./config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/elasticsearch.yml
+      - elk-data:/usr/share/elasticsearch/data
+    networks:
+      - elk-network
+
   blog:
     build: .
+    container_name: blog
+    command: bash -c "./wait_for_db.sh && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     environment:
-      - MYSQL_DATABASE='blog'
-      - MYSQL_USER='root'
-      - MYSQL_PASSWORD='123456'
-    volumes:
-      - .:/django-app
-      - /tmp/django-app/mysqld:/run/mysqld
+      - MYSQL_DATABASE=blog
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_HOST=db
+      - EMAIL_HOST_USER=xx
+      - EMAIL_HOST_PASSWORD=xx
     depends_on:
       - db
-volumes:
-  db_data: {}
+      - elk1
+    networks:
+      - elk-network
+volumes: 
+    db_data:
+      driver: local
+    elk-data:
+      driver: local
+
+networks:
+  elk-network:
+    driver: 
+      bridge
