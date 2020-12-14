@@ -26,7 +26,7 @@ SECRET_KEY = "&#xd^30lr9a21=q6^ac#cdn^0v0o0)2m09pel+ppn456@a%m0c"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.99.100']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -83,8 +83,8 @@ DATABASES = {
         "NAME": os.environ.get("MYSQL_DATABASE"),
         "USER": os.environ.get("MYSQL_USER"),
         "PASSWORD": os.environ.get("MYSQL_ROOT_PASSWORD"),
-        "PORT": "3306",
-        "HOST": "db",
+        "PORT": os.environ.get("PORT", "3306"),
+        "HOST": os.environ.get("HOST", "localhost"),
     }
 }
 
@@ -133,5 +133,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 ELASTICSEARCH_DSL = {
-    "default": {"hosts": "elk1:9200"},
+    "default": {"hosts": os.environ.get("ELASTIC_HOST", "localhost:9200")},
 }
