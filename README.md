@@ -26,6 +26,8 @@ If you want to tear-down the application, use the command written below:
 $ docker-compose down
 ```
 
+# The Django blog home page looks as follows:
+
 ![Screenshot](django-blog.PNG)
 
 
