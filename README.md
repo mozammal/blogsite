@@ -26,4 +26,6 @@ If you want to tear-down the application, use the command written below:
 $ docker-compose down
 ```
 
+![Screenshot](django-blog.png)
+
 
